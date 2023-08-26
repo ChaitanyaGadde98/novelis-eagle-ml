@@ -51,6 +51,7 @@ def predict_single():
     data_reader_merger = DataReaderAndMerger(TEST_SENSOR_PATH, TEST_HIGH_FREQ_PATH, TEST_PERCENT_REF_PATH,
                                              trainTest="test")
     dataset = data_reader_merger.read_and_merge()
+    dataset.to_csv("data/test/merged_unprocessed.csv")
     print("[INFO] Dataset Merger - Success")
     # data preprocessing
     data_preprocessing = DataPreprocessing(dataset)
@@ -83,6 +84,7 @@ def predict():
     data_reader_merger = DataReaderAndMerger(TEST_SENSOR_PATH, TEST_HIGH_FREQ_PATH, TEST_PERCENT_REF_PATH,
                                              trainTest="test")
     dataset = data_reader_merger.read_and_merge()
+    dataset.to_csv("data/test/merged_unprocessed.csv")
     print("[INFO] Dataset Merger - Success")
     # data preprocessing
     data_preprocessing = DataPreprocessing(dataset)
