@@ -12,4 +12,6 @@
 7. Please go throught the EagleMLDatasetAnalysis.ipynb, this python notebook has exploratory analysis of dataset with my findings.
 8. I also attached a three paged Report on the steps and findings of mine, open EagleML - Analysis Report.pdf.
 
+Github repo link for the code: https://github.com/ChaitanyaGadde98/novelis-eagle-ml.git
+
 Please note that the application only supports csv file formats only.
