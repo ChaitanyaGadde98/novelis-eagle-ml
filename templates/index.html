@@ -37,13 +37,13 @@
         }
 
         .container {
-            /* remove flex: 1; */
+
             padding: 20px;
             background-color: #ffffff;
             border-radius: 5px;
             box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.1);
-            margin: auto; /* Add this to center it horizontally */
-            max-width: 1000px; /* Optional: This sets a maximum width for the container */
+            margin: auto; 
+            max-width: 1000px; 
         }
 
         .results-table {
@@ -90,7 +90,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* if you want to set a specific width or height, you can do that here */
         }
 
 
@@ -111,12 +110,27 @@
                                 <button type="submit" class="btn btn-primary btn-upload ml-md-2 mt-2 mt-md-0" onclick="uploadFiles(event)">Upload <i class="fas fa-upload"></i></button>
                             </div>
                         </form>
-                        <div class="btn-row">
-                            <button class="btn btn-secondary mt-3" id="predict-btn" style="display:none" onclick="predictFunction()">Predict <i class="fas fa-brain"></i></button>
-                            <button class="btn btn-secondary mt-3" id="download-csv-btn" style="display:none">
-                                Download CSV<i class="fas fa-download"></i>
-                            </button>
+                        <div class="row">
+
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <button class="btn btn-secondary mt-3 mr-1" id="predict-best-btn" style="display:none" onclick="predictFunction('/predict_best')">Predict Best Model <i class="fas fa-brain"></i></button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button class="btn btn-secondary mt-3" id="predict-ensemble-btn" style="display:none" onclick="predictFunction('/predict_ensemble')">Predict Ensemble Model <i class="fas fa-brain"></i></button>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 text-right">
+                                <button class="btn btn-secondary mt-3" id="download-csv-btn" style="display:none">Download CSV<i class="fas fa-download"></i></button>
+                            </div>
                         </div>
+                        
+                        
+                        
                         <div class="results-table mt-3">
                             <div class="row">
                         
@@ -143,7 +157,7 @@
                                     </table>
                                 </div>
                         
-                                <!-- Confusion Matrix Table -->
+ 
                                 <div class="col-md-6">
                                     <h5>Confusion Matrix</h5>
                                     <table class="table table-bordered table-hover">
@@ -169,9 +183,8 @@
                                     </table>
                                 </div>
                         
-                            </div> <!-- End of row -->
+                            </div> 
                         
-                            <!-- Visualization for scores -->
                             <h5 class="mt-3">Scores Visualization</h5>
                             <div class="visualization-container">
                                 <div id="plotly-chart"></div>
@@ -191,55 +204,69 @@
 
     <script>
         function uploadFiles(event) {
-            event.preventDefault();
+    event.preventDefault();
 
-            // Show a loading spinner or some indicator
-            document.getElementById('loading-spinner').style.display = 'block';
+    document.getElementById('loading-spinner').style.display = 'block';
 
-            const filesInput = document.getElementById('file-input');
-            const files = filesInput.files;
-            const formData = new FormData();
+    const filesInput = document.getElementById('file-input');
+    const files = filesInput.files;
 
-            for (const file of files) {
-                formData.append('files[]', file);
-            }
+    const expectedFiles = ['Sensor.csv', 'Sensor_high_freq.csv', 'Percent_reference.csv'];
+    let uploadedFiles = Array.from(files).map(file => file.name);
 
-            fetch('/upload', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.text())
-            .then(text => {
-                if (text.includes('success')) {
-                    document.getElementById('predict-btn').style.display = 'block';
-                } else {
-                    alert('File upload failed. Please try again.');
-                }
+    const missingFiles = expectedFiles.filter(f => !uploadedFiles.includes(f));
+    
+    if (missingFiles.length) {
+        alert(`Please upload the following files: ${missingFiles.join(", ")}`);
+        document.getElementById('loading-spinner').style.display = 'none';
+        return;
+    }
 
-                document.getElementById('loading-spinner').style.display = 'none';
-            })
-            .catch(error => {
-                console.error('Error uploading files:', error);
-                alert('An error occurred during the file upload.');
-                document.getElementById('loading-spinner').style.display = 'none';
-            });
-        }
+    const formData = new FormData();
 
-        function predictFunction() {
+    for (const file of files) {
+        formData.append('files[]', file);
+    }
 
-            document.getElementById('loading-spinner').style.display = 'block';
-
-    fetch('/predict')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
+    fetch('/upload', {
+        method: 'POST',
+        body: formData
     })
-    .then(data => {
+    .then(response => response.text())
+    .then(text => {
+        if (text.includes('success')) {
+            document.getElementById('predict-best-btn').style.display = 'block';
+            document.getElementById('predict-ensemble-btn').style.display = 'block';
+        } else {
+            alert('File upload failed. Please try again.');
+        }
+
+        document.getElementById('loading-spinner').style.display = 'none';
+    })
+    .catch(error => {
+        console.error('Error uploading files:', error);
+        alert('An error occurred during the file upload.');
+        document.getElementById('loading-spinner').style.display = 'none';
+    });
+}
+
+
+function predictFunction(endpoint) {
+
+document.getElementById('loading-spinner').style.display = 'block'; 
+
+fetch(endpoint, {
+    method: 'GET'
+})
+.then(response => {
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json();
+})
+.then(data => {
         console.log('Received Scores:', data);
 
-        // Display scores in the table
         document.getElementById('precision-val').innerText = data.scores.precision.toFixed(4);
         document.getElementById('recall-val').innerText = data.scores.recall.toFixed(4);
         document.getElementById('f1-score-val').innerText = data.scores.f1_score.toFixed(4);
@@ -268,11 +295,9 @@
         
         Plotly.newPlot('plotly-chart', plotData, layout, { responsive: true });
 
-        // Display the download CSV button
         const downloadBtn = document.getElementById('download-csv-btn');
         downloadBtn.style.display = 'block';
 
-        // Display the results table.
         document.querySelector('.results-table').style.display = 'block';
         document.getElementById('loading-spinner').style.display = 'none';
     })
@@ -283,9 +308,8 @@
     });
 }
 
-// Add event listener for download CSV button
 document.getElementById('download-csv-btn').addEventListener('click', function() {
-    window.location.href = '/download_preds';  // Assuming the server-side route for downloading the CSV is /download_csv
+    window.location.href = '/download_preds';  
 });
     </script>
 </body>

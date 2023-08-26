@@ -10,6 +10,8 @@ TRAIN_SENSOR_PATH = "data/train/Sensor.csv"
 TRAIN_HIGH_FREQ_PATH = "data/train/Sensor_high_freq.csv"
 TRAIN_PERCENT_REF_PATH = "data/train/Percent_reference.csv"
 
+BEST_MODEL = "model/random_forest_model_best.pkl"
+
 MODEL_PATH = "model/random_forest_model.pkl"
 FIGURES_PATH = "figures"
 DATA_FOLDER = "data/test"

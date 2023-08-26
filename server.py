@@ -17,6 +17,7 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    print("Upload")
     keywords_list = ['Percent_reference', 'Sensor_high_freq', 'Sensor']
     files = request.files.getlist('files[]')
 
@@ -41,13 +42,13 @@ def upload_file():
 
     if all(keyword in detected_keywords for keyword in keywords_list):
         return jsonify({'success': True, 'message': 'Files successfully uploaded.'}), 200
-
+    print("upload success")
     return jsonify({'success': False, 'message': 'Required files not uploaded'}), 400
 
 
-@app.route('/predict_single', methods=['GET'])
-def predict_single():
-    print("predict")
+@app.route('/predict_best', methods=['GET'])
+def predict_best():
+    print("predict best")
     data_reader_merger = DataReaderAndMerger(TEST_SENSOR_PATH, TEST_HIGH_FREQ_PATH, TEST_PERCENT_REF_PATH,
                                              trainTest="test")
     dataset = data_reader_merger.read_and_merge()
@@ -71,16 +72,16 @@ def predict_single():
     preprocessed_data = data_preprocessing.getProcessedData()
 
     # model evaluation
-    model_evaluator = ModelBuilderAndEvaluator(preprocessed_data, mode='test', model_path=MODEL_PATH)
+    model_evaluator = ModelBuilderAndEvaluator(preprocessed_data, mode='test', model_path=BEST_MODEL)
     scores = model_evaluator.test(return_predictions=False)
     # with open("temp/test_results.csv", 'r') as file:
     #     csv_data = file.read()
     print(scores)
     return jsonify({"scores": scores}), 200
 
-@app.route('/predict', methods=['GET'])
-def predict():
-    print("predict")
+@app.route('/predict_ensemble', methods=['GET'])
+def predict_ensemble():
+    print("predict ensemble")
     data_reader_merger = DataReaderAndMerger(TEST_SENSOR_PATH, TEST_HIGH_FREQ_PATH, TEST_PERCENT_REF_PATH,
                                              trainTest="test")
     dataset = data_reader_merger.read_and_merge()
