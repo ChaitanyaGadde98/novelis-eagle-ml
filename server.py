@@ -28,13 +28,11 @@ def upload_file():
     for file in files:
         if file.filename.endswith('.csv'):
             for keyword in keywords_list:
-                # Check if keyword is 'Sensor' and filename contains 'Sensor' but not 'high'
                 if keyword == "Sensor" and "Sensor" in file.filename and "high" not in file.filename:
                     file_path = os.path.join(DATA_FOLDER, f"{keyword}.csv")
                     file.save(file_path)
                     detected_keywords.append(keyword)
                     break
-                # Check for other keywords
                 elif keyword in file.filename:
                     file_path = os.path.join(DATA_FOLDER, f"{keyword}.csv")
                     file.save(file_path)
